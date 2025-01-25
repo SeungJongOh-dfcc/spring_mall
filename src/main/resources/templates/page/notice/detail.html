@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <th:block layout:fragment="css">
+    <link href="css/main.css" th:href="@{/css/main.css}" rel="stylesheet">
+  </th:block>
+  <title>상품 > 상세</title>
+</head>
+<body>
+  <div layout:fragment="content">
+      <div class="detail">
+          <h4>상세페이지(공지)</h4>
+          <img src="https://placehold.co/300" alt="공지이미지" />
+          <div>
+              <p th:text="${notice.id} + 번">인덱스</p>
+              <h4 th:text="${notice.title}">공지명</h4>
+              <p th:text="${notice.createdAt}">날짜</p>
+          </div>
+          <a class="btn-anchor" th:href="@{'/edit/' + ${notice.id}}">수정</a>
+          <button th:onclick="showDeleteModal('[[${notice.id}]]')">삭제</button>
+      </div>
+      <!-- 삭제 확인 모달 -->
+      <div id="delete-modal" class="modal">
+          <div class="modal-content">
+              <p>정말로 삭제하시겠습니까?</p>
+              <button class="btn-confirm" id="confirm-delete">삭제</button>
+              <button class="btn-cancel" id="cancel-delete">취소</button>
+          </div>
+      </div>
+  </div>
+
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+        const showDeleteModal = (id) => {
+            const modal = document.getElementById("delete-modal");
+            modal.style.display = 'flex';
+
+            // 삭제 확인 버튼 클릭 이벤트 추가
+            document.getElementById('confirm-delete').onclick = () => deleteHandler(id);
+            // 취소 버튼 클릭 이벤트
+            document.getElementById('cancel-delete').onclick = () => modal.style.display = "none";
+        };
+        const deleteHandler = async (id) => {
+          const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+          const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            try {
+                const response = await fetch(`/detail/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                      [csrfHeader]: csrfToken,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to delete Item ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                const origin = window.location.origin;
+                alert('삭제가 완료되었습니다.');
+                window.location.assign(origin + result?.redirectUrl);
+            } catch (err) {
+                console.error("삭제 실패", err);
+                alert('삭제 중 문제가 발생했습니다.');
+            } finally {
+                document.getElementById('delete-modal').style.display = 'none';
+            }
+
+        }
+    </script>
+  </th:block>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <th:block layout:fragment="css">
+    <link href="css/main.css" th:href="@{/css/main.css}" rel="stylesheet">
+  </th:block>
+  <title>상품 > 리스트</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="content-top">
+    <a th:href="@{/write}" style="position:absolute; right: 30px;">글 쓰기</a>
+  </div>
+    <a th:href="@{'/detail/' + ${item.id}}" class="card" th:each="item, i : ${itemAll}">
+        <img src="https://placehold.co/300" alt="상품이미지" />
+        <div>
+            <p th:text="${i.index + 1} + 번">인덱스</p>
+            <h4 th:text="'상품명: ' + ${item.title}">상품명</h4>
+            <div
+                class="value"
+                th:text="'가격: ' + ${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') + '원'}"
+            >
+              가격
+            </div>
+          <div th:text="'글 작성자: ' + ${item.user.getUsername()}">글 작성자</div>
+        </div>
+    </a>
+</div>
+</body>
+</html>

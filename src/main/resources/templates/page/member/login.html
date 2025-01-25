@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <th:block layout:fragment="css">
+    <link href="css/main.css" th:href="@{/css/main.css}" rel="stylesheet">
+  </th:block>
+  <title>로그인</title>
+</head>
+<body>
+  <div layout:fragment="content">
+    <!-- 에러 메시지 영역 -->
+    <div id="error-message" style="color: red; margin-bottom: 10px;"></div>
+    <div th:if="${param.error}">
+      <h4>아이디나 비밀번호가 맞지 않습니다.</h4>
+    </div>
+    <form action="/login" method="post" id="login-form">
+      <!--  CSRF 토큰    -->
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+      <!-- // CSRF     -->
+      <label for="userId">아이디:
+        <input name="userId" id="userId" type="text" placeholder="아이디를 입력하세요."/>
+      </label>
+      <label for="password">비밀번호:
+        <input name="password" id="password" type="password" placeholder="비밀번호를 입력하세요." />
+      </label>
+      <button type="submit">로그인</button>
+    </form>
+
+    <div class="card" style="display: flex; gap: 10px;">
+      <p>회원이 아니십니까?</p>
+      <a class="btn-anchor" th:href="@{/signup}">회원가입</a>
+    </div>
+  </div>
+
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+      const validateForm = (event) => {
+        const userId = document.getElementById("userId").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        // 에러 메세지 초기화
+        const errorMsg = document.getElementById('error-message');
+        errorMsg.textContent = '';
+
+        // validation Check
+        if(!userId) {
+          errorMsg.textContent = '아이디를 입력해주세요.';
+          event.preventDefault(); // 폼 제출 중단
+          return false;
+        }
+
+        if(!password) {
+          errorMsg.textContent = '비밀번호를 입력해주세요.';
+          event.preventDefault();
+          return false;
+        }
+
+        if(password.length < 4 || password.length > 12) {
+          errorMsg.textContent = '비밀번호는 4자 이상 12자 이하로 입력해주세요.';
+          event.preventDefault();
+          return false;
+        }
+
+        // 유효성 검사 통과하면 폼 제출 허용
+        return true;
+      }
+
+      // DOM 로드 후 이벤트 리스너 등록
+      document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('login-form');
+        form.addEventListener('submit', validateForm);
+      });
+    </script>
+  </th:block>
+</body>
+</html>

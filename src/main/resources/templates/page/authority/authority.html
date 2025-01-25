@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <th:block layout:fragment="css">
+    <link href="css/main.css" th:href="@{/css/main.css}" rel="stylesheet">
+  </th:block>
+  <title>어드민 > 권한</title>
+</head>
+<body>
+  <div layout:fragment="content">
+    <!-- 에러 메시지 영역 -->
+    <div id="error-message" style="color: red; margin-bottom: 10px;"></div>
+
+    <div class="card">
+      <table>
+        <tr>
+          <th>순서</th>
+          <th>ID</th>
+          <th>권한</th>
+        </tr>
+        <tr th:each="authItem, i : ${authData}">
+          <td th:text="${i.index + 1}">순서</td>
+          <td th:text="${authItem.userId}">ID</td>
+          <td th:text="${authItem.roleName}">권한</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+<script th:inline="javascript">
+
+</script>
+</body>
+</html>

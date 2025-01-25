@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko"
+    xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+  <title>Title</title>
+  <meta charset="UTF-8">
+  <!-- CSRF 토큰 -->
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+  <link th:href="@{/css/layout.css}" rel="stylesheet">
+  <!-- 각 페이지의 css가 작성될 위치 -->
+  <th:block layout:fragment="css"></th:block>
+</head>
+<body>
+
+<div th:replace="fragments/header::header"></div>
+
+<div layout:fragment="content" class="content"></div>
+
+<div th:replace="fragments/footer::footer"></div>
+
+<!-- 각 페이지의 script가 작성될 위치 -->
+<th:block layout:fragment="script"></th:block>
+
+</body>
+</html>

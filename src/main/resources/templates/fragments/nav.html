@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="navbar" th:fragment="navbar">
+  <ul>
+    <li><a class="logo" th:href="@{/}">SpringMall</a></li>
+    <li><a th:href="@{/list}">List</a></li>
+    <li><a th:href="@{/write}" sec:authorize="hasAuthority('ROLE_ADMIN')">Write</a></li>
+    <li><a th:href="@{/authority}" sec:authorize="hasAuthority('ROLE_ADMIN')">권한부여</a></li>
+    <li><a th:href="@{/notice/list}">Notice</a></li>
+  </ul>
+  <div sec:authorize="isAuthenticated()" style="display: flex; flex-direction: row; position: absolute; right: 350px;">
+      <span sec:authentication="principal.username"></span>
+      <span>님 안녕하세요?</span>
+  </div>
+  <div style="position: absolute; right: 20px; display: flex; gap: 20px;">
+    <a
+        th:href="@{/my-page}"
+        sec:authorize="isAuthenticated()"
+    >
+      마이페이지
+    </a>
+    <a
+        th:href="@{/logout}"
+        sec:authorize="isAuthenticated()"
+    >
+      로그아웃
+    </a>
+    <a
+        th:href="@{/login}"
+        sec:authorize="isAnonymous()"
+    >
+      로그인
+    </a>
+  </div>
+</div>
+</body>
+</html>

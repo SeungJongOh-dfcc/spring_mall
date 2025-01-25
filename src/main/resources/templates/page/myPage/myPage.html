@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <th:block layout:fragment="css">
+    <link href="css/main.css" th:href="@{/css/main.css}" rel="stylesheet">
+  </th:block>
+  <title>마이페이지</title>
+</head>
+<body>
+  <div layout:fragment="content">
+    <h4>마이페이지임</h4>
+    <div>
+      <div sec:authorize="isAuthenticated()" style="display: flex; flex-direction: column;">
+        <div style="display: flex; flex-direction: row;">
+          <span th:text="${userName}"></span>
+          <span>님 안녕하세요?</span>
+        </div>
+        <div style="display: flex; flex-direction: row;">
+          <span>회원님은 </span>
+          <span th:text="${authority}"></span>
+          <span>입니다.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

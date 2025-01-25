@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <th:block layout:fragment="css">
+    <link href="css/main.css" th:href="@{/css/main.css}" rel="stylesheet">
+  </th:block>
+  <title>상품 > 수정</title>
+</head>
+<body>
+  <div layout:fragment="content">
+    <!-- 에러 메시지 영역 -->
+    <div id="error-message" style="color: red; margin-bottom: 10px;"></div>
+    <div id="item-form">
+      <label for="title">상품명:
+        <input name="title" id="title" type="text" th:value="${item.title}"/>
+      </label>
+      <br />
+      <label for="price">가격:
+        <input name="price" id="price" type="number" th:value="${item.price}"/>
+      </label>
+      <button th:attr="onclick='handleUpdate(' + ${item.id} + ')'">수정</button>
+      <a class="btn-anchor" th:href="@{'/detail/' + ${item.id}}">취소</a>
+    </div>
+  </div>
+
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+      const updateItem = async(id, updates) => {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+        try {
+          const response = await fetch(`/edit/${id}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              [csrfHeader]: csrfToken,
+            },
+            body: JSON.stringify(updates),
+          });
+
+          if(!response.ok) {
+            throw new Error(`Failed to update Item ${response.statusText}`);
+          }
+
+          const result = await response.json();
+          const origin = window.location.origin;
+          window.location.assign(origin + result?.redirectUrl); // 서버에서 받은 URL로 이동
+        } catch (err) {
+          console.error("updateItem 에러", err);
+        }
+      }
+
+      const handleUpdate = (id) => {
+        const title = document.getElementById("title").value.trim();
+        const price= document.getElementById("price").value.trim();
+
+        if (!title) {
+          document.getElementById("error-message").textContent = "상품명을 입력해주세요.";
+          return;
+        }
+
+        if (!price || isNaN(price) || Number(price) <= 0) {
+          document.getElementById("error-message").textContent = "유효한 가격을 입력해주세요.";
+          return;
+        }
+
+        // 업데이트 요청
+        updateItem(id, { title, price });
+      }
+
+    </script>
+  </th:block>
+</body>
+</html>

@@ -1,0 +1,84 @@
+/* 기본 스타일 */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #333; /* 다크 배경 */
+    color: #fff; /* 텍스트 색상 */
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 약간의 그림자 */
+}
+
+/* 로고 스타일 */
+.navbar .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #fff; /* 로고 텍스트 색상 */
+    text-decoration: none;
+}
+
+/* 메뉴 스타일 */
+.navbar ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar ul li {
+    margin: 0 15px;
+}
+
+.navbar ul li a {
+    color: #fff; /* 메뉴 텍스트 색상 */
+    text-decoration: none;
+    font-size: 1em;
+    transition: color 0.3s ease;
+}
+
+.navbar ul li a:hover {
+    color: #ff9800; /* 호버 시 텍스트 색상 */
+}
+
+/* 오른쪽 섹션 */
+.navbar > div {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.navbar > div span {
+    color: #ff9800; /* 사용자명 강조 색상 */
+    font-weight: bold;
+}
+
+.navbar > div a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.navbar > div a:hover {
+    color: #ff9800;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar ul {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .navbar > div {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

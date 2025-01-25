@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <th:block layout:fragment="css">
+    <link href="css/main.css" th:href="@{/css/main.css}" rel="stylesheet">
+  </th:block>
+  <title>홈</title>
+  <meta charset="UTF-8">
+  <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
+  <link rel="shortcut icon" th:href="@{/favicon.ico}" type="image/x-icon">
+</head>
+<body>
+<div layout:fragment="content">
+  <h1>메인 페이지</h1>
+</div>
+
+<th:block layout:fragment="script">
+  <script th:src="@{/js/index.js}"></script>
+</th:block>
+</body>
+</html>
