@@ -8,7 +8,7 @@
 <div class="navbar" th:fragment="navbar">
   <ul>
     <li><a class="logo" th:href="@{/}">SpringMall</a></li>
-    <li><a th:href="@{/list}">List</a></li>
+    <li><a th:href="@{/list(page=1)}">List</a></li>
     <li><a th:href="@{/write}" sec:authorize="hasAuthority('ROLE_ADMIN')">Write</a></li>
     <li><a th:href="@{/authority}" sec:authorize="hasAuthority('ROLE_ADMIN')">권한부여</a></li>
     <li><a th:href="@{/notice/list}">Notice</a></li>
@@ -24,12 +24,11 @@
     >
       마이페이지
     </a>
-    <a
-        th:href="@{/logout}"
-        sec:authorize="isAuthenticated()"
-    >
-      로그아웃
-    </a>
+    <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" style="display:inline;">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+      <button type="submit">로그아웃</button>
+    </form>
+
     <a
         th:href="@{/login}"
         sec:authorize="isAnonymous()"
@@ -38,5 +37,6 @@
     </a>
   </div>
 </div>
+
 </body>
 </html>

@@ -3,6 +3,7 @@ package com.sjoh.shop.controller;
 import com.sjoh.shop.component.AuthorityMapper;
 import com.sjoh.shop.dto.UserDto;
 import com.sjoh.shop.dto.UserRoleDTO;
+import com.sjoh.shop.service.MyUserDetailsService;
 import com.sjoh.shop.service.UserService;
 import com.sjoh.shop.util.CustomUser;
 import jakarta.servlet.http.HttpServletRequest;
@@ -112,10 +113,13 @@ public class UserController {
 
             // 닉네임 얻기
 //            String userName = userService.getUsernameByUserId(auth.getName());    // DB 호출
-            CustomUser userInfo = (CustomUser) auth.getPrincipal();
-            String displayName = userInfo.getDisplayName();
+                MyUserDetailsService.CustomUser userInfo = (MyUserDetailsService.CustomUser) auth.getPrincipal();
+                System.out.println("userInfo = " + userInfo);
+                String displayName = userInfo.getDisplayName();
 
-            model.addAttribute("userName", displayName);
+                model.addAttribute("userName", displayName);
+
+
             // *닉네임 얻기
 
             return "page/myPage/myPage";

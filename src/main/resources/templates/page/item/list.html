@@ -4,9 +4,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default}">
 <head>
-  <th:block layout:fragment="css">
-    <link href="css/main.css" th:href="@{/css/main.css}" rel="stylesheet">
-  </th:block>
+  <link href="css/main.css" th:href="@{/css/main.css}" rel="stylesheet">
   <title>상품 > 리스트</title>
 </head>
 <body>
@@ -14,20 +12,49 @@
   <div class="content-top">
     <a th:href="@{/write}" style="position:absolute; right: 30px;">글 쓰기</a>
   </div>
-    <a th:href="@{'/detail/' + ${item.id}}" class="card" th:each="item, i : ${itemAll}">
-        <img src="https://placehold.co/300" alt="상품이미지" />
-        <div>
-            <p th:text="${i.index + 1} + 번">인덱스</p>
-            <h4 th:text="'상품명: ' + ${item.title}">상품명</h4>
-            <div
-                class="value"
-                th:text="'가격: ' + ${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') + '원'}"
-            >
-              가격
-            </div>
-          <div th:text="'글 작성자: ' + ${item.user.getUsername()}">글 작성자</div>
+<!-- 검색 -->
+  <form action="/search" method="GET">
+    <input name="searchText" style="display: inline;">
+    <button type="submit">검색</button>
+  </form>
+  <!-- 상품 리스트 -->
+  <div class="product-list">
+    <a th:href="@{'/detail/' + ${item.id}}" class="card" th:each="item, i : ${itemAll.content}">
+      <img src="https://placehold.co/300" alt="상품이미지" />
+      <div>
+        <p th:text="${i.index + 1} + 번">인덱스</p>
+        <h4 th:text="'상품명: ' + ${item.title}">상품명</h4>
+        <div
+            class="value"
+            th:text="'가격: ' + ${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') + '원'}"
+        >
+          가격
         </div>
+        <div th:text="'글 작성자: ' + ${item.user.getUsername()}">글 작성자</div>
+      </div>
     </a>
+  </div>
+
+  <!-- 페이지네이션 -->
+  <nav class="pagination">
+    <ul>
+      <!-- 이전 페이지 -->
+      <li th:if="${itemAll.hasPrevious()}">
+        <a th:href="@{/list(page=${itemAll.number - 1})}">&laquo; 이전</a>
+      </li>
+
+      <!-- 페이지 번호 -->
+      <li th:each="page : ${#numbers.sequence(1, itemAll.totalPages)}"
+          th:classappend="${page -1 == itemAll.number} ? 'active'">
+        <a th:href="@{/list(page=${page})}" th:text="${page}"></a>
+      </li>
+
+      <!-- 다음 페이지 -->
+      <li th:if="${itemAll.hasNext()}">
+        <a th:href="@{/list(page=${itemAll.number + 1})}">다음 &raquo;</a>
+      </li>
+    </ul>
+  </nav>
 </div>
 </body>
 </html>

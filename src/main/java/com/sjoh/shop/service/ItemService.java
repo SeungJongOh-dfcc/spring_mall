@@ -5,6 +5,8 @@ import com.sjoh.shop.model.User;
 import com.sjoh.shop.repository.ItemRepository;
 import com.sjoh.shop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -24,6 +26,10 @@ public class ItemService {
 
     public ArrayList<Item> getItemAll() {
         return (ArrayList<Item>) itemRepository.findAll();
+    }
+
+    public Page<Item> getPageItemList(Pageable page) {
+        return itemRepository.findPageBy(page);
     }
 
     public boolean savedItem(Item formData, String userId) throws Exception {

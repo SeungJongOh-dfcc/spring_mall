@@ -20,7 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 //        http.csrf((csrf) -> csrf.disable());  // csrf 끄기
         http.csrf((csrf) -> csrf.csrfTokenRepository(csrfTokenRepository())
-                .ignoringRequestMatchers("/login", "/h2-console/**"));
+                .ignoringRequestMatchers("/login", "/logout", "/h2-console/**"));
 
         http.authorizeHttpRequests(
                 (authorize) ->
@@ -40,7 +40,13 @@ public class SecurityConfig {
         );
 
         // 로그아웃
-        http.logout(logout -> logout.logoutUrl("/logout"));
+        // 로그아웃 설정
+        http.logout(logout -> logout
+                .logoutUrl("/logout")             // 로그아웃 URL
+                .logoutSuccessUrl("/login")       // 로그아웃 성공 시 이동할 URL
+                .invalidateHttpSession(true)      // 세션 무효화
+                .deleteCookies("JSESSIONID")      // JSESSIONID 쿠키 삭제
+        );
 
         return http.build();
     }

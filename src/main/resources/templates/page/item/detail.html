@@ -4,9 +4,9 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default}">
 <head>
-  <th:block layout:fragment="css">
+<!--  <th:block layout:fragment="css">-->
     <link href="css/main.css" th:href="@{/css/main.css}" rel="stylesheet">
-  </th:block>
+<!--  </th:block>-->
   <title>상품 > 상세</title>
 </head>
 <body>
@@ -21,7 +21,7 @@
           </div>
         <div th:if="${item.user.userId == authId || #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
           <a class="btn-anchor" th:href="@{'/edit/' + ${item.id}}">수정</a>
-          <button th:onclick="showDeleteModal('[[${item.id}]]')">삭제</button>
+          <button th:onclick="showDeleteModal('[[${item.id}]]', 'item')">삭제</button>
         </div>
       </div>
       <!-- 삭제 확인 모달 -->
@@ -32,19 +32,101 @@
               <button class="btn-cancel" id="cancel-delete">취소</button>
           </div>
       </div>
+
+    <div class="comments">
+      <!-- 댓글 리스트 -->
+      <div th:each="comment : ${comments}" class="comment">
+        <div class="comment-container">
+          <!-- 댓글 정보 -->
+          <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
+            <strong
+                class="comment-author"
+                th:text="${comment.userName != null ? comment.userName : comment.userId}"
+            >
+              작성자
+            </strong>
+            <div class="comment-actions">
+              <button class="reply-button" sec:authorize="isAuthenticated()" onclick="showReplyInput(this)">답글</button>
+              <span class="recommend">추천 0</span>
+              <button
+                  class="delete-button"
+                  th:if="${authId == comment.userId}"
+                  th:onclick="showDeleteModal('[[${comment.id}]]', 'comment')"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+
+          <!-- 댓글 내용 -->
+          <p class="comment-content" th:text="${comment.content}">댓글 내용</p>
+
+          <!-- 답글 입력 필드 (숨겨진 상태로 시작) -->
+          <form
+              th:action="@{/comments/{itemId}(itemId=${item.id})}"
+              method="post"
+              sec:authorize="isAuthenticated()"
+              class="comment-form"
+              style="display: none; margin-top: 10px;"
+          >
+            <textarea name="content" placeholder="댓글을 작성하세요" required></textarea>
+            <input type="hidden" name="userId" id="user-id2" th:value="${authId}">
+            <input type="hidden" name="userName" id="user-name2" th:value="${authName}">
+            <input type="hidden" name="parentId" id="parent-id2" th:value="${comment.id}">
+            <button type="submit">댓글 등록</button>
+          </form>
+        </div>
+
+
+        <!-- 대댓글 -->
+        <div th:each="reply : ${comment.children}" class="comment reply">
+          <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
+            <strong th:text="${reply.userName != null ? reply.userName : reply.userId}">작성자</strong>
+            <div class="comment-actions">
+              <span class="recommend">추천 0</span>
+              <button
+                  class="delete-button"
+                  th:if="${authId == reply.userId}"
+                  th:onclick="showDeleteModal('[[${reply.id}]]', 'comment')"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+          <p th:text="${reply.content}">대댓글 내용</p>
+        </div>
+      </div>
+
+      <!-- 댓글 작성 폼 (로그인 사용자만 가능) -->
+      <form th:action="@{/comments/{itemId}(itemId=${item.id})}" method="post" sec:authorize="isAuthenticated()" class="comment-form">
+        <textarea name="content" placeholder="댓글을 작성하세요" required></textarea>
+        <input type="hidden" name="userId" id="user-id" th:value="${authId}">
+        <input type="hidden" name="userName" id="user-name" th:value="${authName}">
+        <input type="hidden" name="parentId" id="parent-id" value="">
+        <button type="submit">댓글 등록</button>
+      </form>
+
+      <!-- 비로그인 사용자 메시지 -->
+      <div class="no-permission" sec:authorize="isAnonymous()">
+        <p>로그인을 하셔야 댓글을 쓰실 수 있습니다.</p>
+      </div>
+    </div>
+
   </div>
 
   <th:block layout:fragment="script">
     <script th:inline="javascript">
-        const showDeleteModal = (id) => {
+        const showDeleteModal = (id, type) => {
             const modal = document.getElementById("delete-modal");
             modal.style.display = 'flex';
 
             // 삭제 확인 버튼 클릭 이벤트 추가
-            document.getElementById('confirm-delete').onclick = () => deleteHandler(id);
+            document.getElementById('confirm-delete').onclick = () =>
+                type === 'item' ? deleteHandler(id) : deleteCommentHandler(id);
             // 취소 버튼 클릭 이벤트
             document.getElementById('cancel-delete').onclick = () => modal.style.display = "none";
         };
+
         const deleteHandler = async (id) => {
           // csrf 토큰과 헤더 이름 가져오기
           const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
@@ -75,6 +157,47 @@
             }
 
         }
+
+        const deleteCommentHandler = async (id) => {
+          // csrf 토큰과 헤더 이름 가져오기
+          const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+          const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+          try {
+            const response = await fetch(`/comments/${id}`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken,
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`Failed to delete Comment ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            alert('삭제가 완료되었습니다.');
+            window.location.assign(window.location.href);
+          } catch (err) {
+            console.error("삭제 실패", err);
+            alert('삭제 중 문제가 발생했습니다.');
+          } finally {
+            document.getElementById('delete-modal').style.display = 'none';
+          }
+
+        }
+
+        function showReplyInput(button) {
+          // 부모 요소에서 해당 댓글의 form 태그를 찾음
+          const form = button.closest('.comment-container').querySelector('.comment-form');
+          console.log(form);
+
+          // form의 display 속성을 'block'으로 변경하여 표시
+          form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+        }
+
+
     </script>
   </th:block>
 </body>

@@ -1,9 +1,14 @@
 package com.sjoh.shop.controller;
 
+import com.sjoh.shop.model.Comment;
 import com.sjoh.shop.model.Item;
+import com.sjoh.shop.service.CommentService;
 import com.sjoh.shop.service.ItemService;
+import com.sjoh.shop.service.MyUserDetailsService;
 import com.sjoh.shop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -17,18 +22,26 @@ import java.util.*;
 public class ItemController {
 
     private final ItemService itemService;
-    private final UserService userService;
+//    private final UserService userService;
+    private final CommentService commentService;
 
     @Autowired
-    public ItemController(ItemService itemService, UserService userService) {
+    public ItemController(ItemService itemService, CommentService commentService) {
         this.itemService = itemService;
-        this.userService = userService;
+        this.commentService = commentService;
     }
 
+//    @GetMapping("/list")
+//    public String list(Model model) {
+//        ArrayList<Item> itemAll = itemService.getItemAll();
+//        model.addAttribute("itemAll", itemAll);
+//        return "page/item/list";
+//    }
+
     @GetMapping("/list")
-    public String list(Model model) {
-        ArrayList<Item> itemAll = itemService.getItemAll();
-        model.addAttribute("itemAll", itemAll);
+    public String getListPage(@RequestParam(defaultValue = "1") Integer page, Model model) {
+        Page<Item> pageItemList = itemService.getPageItemList(PageRequest.of(page - 1, 5));
+        model.addAttribute("itemAll", pageItemList);
         return "page/item/list";
     }
 
@@ -65,12 +78,20 @@ public class ItemController {
             Item item = itemService.findItemById(id);
             model.addAttribute("item", item);
 
+            // 댓글
+            List<Comment> comments = commentService.getCommentsByItem(id);
+            model.addAttribute("comments", comments);
+
             if(auth != null) {
                 String authId = auth.getName();
+                MyUserDetailsService.CustomUser userInfo = (MyUserDetailsService.CustomUser) auth.getPrincipal();
+                String displayName = userInfo.getDisplayName();
 //                Object authId = userService.getIdByUserId(authName);
                 model.addAttribute("authId", authId);
+                model.addAttribute("authName", displayName);
             } else {
                 model.addAttribute("authId", "");
+                model.addAttribute("authName", "");
             }
 
             return "page/item/detail";
@@ -106,5 +127,10 @@ public class ItemController {
         }
 
         return ResponseEntity.badRequest().body("아이템이 삭제되지 않았습니다.");
+    }
+
+    @GetMapping("/search")
+    public String postSearch(@RequestParam String searchText) {
+        return "";
     }
 }
